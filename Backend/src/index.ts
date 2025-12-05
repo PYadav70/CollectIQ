@@ -1,0 +1,198 @@
+import express from "express";
+import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt"
+import { contentModel, linkModel, userModel } from "./db.js";
+import { JWT_SECRET } from "./config.js";
+import dotenv from 'dotenv';
+import { userMiddleware } from "./middleware.js";
+dotenv.config();
+
+const app = express();
+app.use(express.json())
+
+
+const PORT = process.env.PORT || 3000
+
+app.post('/api/v1/signup', async(req,res)=>{
+    const {username,password} = req.body;
+
+    if(!username || !password){
+        return res.status(400).json({
+            msg:"missing input"
+        })
+    }
+    try {
+        const salt = await bcrypt.genSalt(5);
+        const hashPassword = await bcrypt.hash(password,salt)
+
+        await userModel.create({
+            username:username,
+            password:hashPassword
+        })
+         return res.status(200).json({
+            msg: "Signed up"
+        })
+    } catch (error:any) {
+         if (error.code === 11000) {
+            // duplicate username
+            return res.status(409).json({
+                msg: "User already exists"
+            });
+        }
+
+        // Other unknown errors
+        console.error("Signup error:", error);
+        return res.status(500).json({
+            msg: "Something went wrong",
+            error: error.message
+        });
+    }
+    
+})
+
+
+app.post('/api/v1/signin', async(req,res)=>{
+    try {
+        const username = req.body.username
+        const password = req.body.password
+
+        if(!username || !password){
+            return res.status(401).json({
+                msg:"username and password required"
+            })
+        }
+        const user = await userModel.findOne({
+            username
+        })
+          if (!user) {
+            return res.status(404).json({
+                msg: "User not found"
+            })
+        }
+
+          const isPasswordCorrect = await bcrypt.compare(password, user.password)
+
+        if (!isPasswordCorrect) {
+            return res.status(401).json({
+                msg: "Invalid password"
+            })
+        }
+
+        const token = jwt.sign({
+            id: user._id,
+            username: user.username
+
+        },JWT_SECRET)
+
+         return res.status(200).json({
+            msg: "Login successful",
+            token,
+        });
+    } catch (error) {
+         console.log("Signin error");
+
+        return res.status(411).json({
+            msg: "Something went wrong",
+            error: error
+        })
+    }
+})
+
+app.post('/api/v1/content',userMiddleware, async(req,res)=>{
+     const link = req.body.link;
+     const type = req.body.type;
+
+    await contentModel.create({
+        link,
+        type,
+        //@ts-ignore-
+        userId: req.userId,
+        tags: []
+    })
+
+   return res.json({
+        msg: "content added"
+    })
+})
+
+app.get('/api/v1/content',userMiddleware, async(req,res)=>{
+     //@ts-ignore
+    const userId = req.userId
+    const content = await contentModel.find({
+        userId: userId
+    }).populate("userId","username")
+
+    res.json({
+        content
+    })
+})
+
+app.delete('/api/v1/content',userMiddleware, async(req,res)=>{
+     const contentId = req.body.contentId
+
+    await contentModel.deleteMany({
+        contentId,
+        //@ts-ignore
+        userId: req.userId
+    })
+
+    res.json({
+        msg: "content deleted"
+    })
+})
+
+app.post('/api/v1/brain/share',userMiddleware,async (req,res)=>{
+    const share = req.body.share;
+    try {
+        if(share){
+            const existingLink = await linkModel.findOne({
+                // userId: req.userId
+            })
+        }
+    } catch (error) {
+        
+    }
+})
+
+app.post('/api/v1/brain/:shareLink', async (req,res)=>{
+     const hash = req.params.shareLink
+
+    //find the link form hash
+    const link = await linkModel.findOne({
+        hash
+    })
+
+    if (!link) {
+        return res.status(411).json({
+            msg: "Invalid link"
+        })
+    }
+
+    //Fetch content & user details
+    const content = await contentModel.find({
+        userId: link.userId
+    })
+
+    const user = await userModel.findOne({
+        _id: link.userId
+    });
+
+    if (!user) {
+        return res.status(411).json({
+            msg: "User not found"
+        })
+    }
+    //if everything is fine, send username & content
+    res.json({
+        username: user.username,
+        content
+    })
+})
+
+app.listen(PORT, ()=>{
+    console.log(`surver is running at: ${PORT}`)
+})
+
+
+
