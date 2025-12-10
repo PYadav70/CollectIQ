@@ -25,7 +25,7 @@ const sizeStyle = {
   lg: "px-7 py-4",
 };
 
-const defaultStyle = "rounded-md font-normal m-2";
+const defaultStyle = "  rounded-md px-2 py-2 font-normal m-2 flex items-center";
 
 export const Button = (props: ButtonProps) => {
   return (

@@ -1,15 +1,19 @@
 import express from "express";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
+import { random } from "./utils.js";
 import bcrypt from "bcrypt"
 import { contentModel, linkModel, userModel } from "./db.js";
 import { JWT_SECRET } from "./config.js";
 import dotenv from 'dotenv';
 import { userMiddleware } from "./middleware.js";
-dotenv.config();
+import cors from 'cors'
 
+
+dotenv.config();
 const app = express();
 app.use(express.json())
+app.use(cors())
 
 
 const PORT = process.env.PORT || 3000
@@ -145,17 +149,49 @@ app.delete('/api/v1/content',userMiddleware, async(req,res)=>{
 app.post('/api/v1/brain/share',userMiddleware,async (req,res)=>{
     const share = req.body.share;
     try {
-        if(share){
+        if (share) {
+            //check if link already exits
             const existingLink = await linkModel.findOne({
-                // userId: req.userId
+                //@ts-ignore
+                userId: req.userId
+            })
+            if (existingLink) {
+                return res.json({
+                    hash: existingLink.hash
+                })
+            }
+
+            //if not exists, create one
+            const hash = random(10)
+            await linkModel.create({
+                //@ts-ignore
+                userId: req.userId,
+                hash
+            })
+
+            res.json({
+                msg: "Updated share link",
+                hash
+            })
+
+        } else {
+            await linkModel.deleteOne({
+                //@ts-ignore
+                userId: req.userId
+            })
+
+            res.json({
+                msg: "Link removed"
             })
         }
-    } catch (error) {
-        
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ msg: "Something went wrong" });
     }
 })
 
-app.post('/api/v1/brain/:shareLink', async (req,res)=>{
+
+app.get('/api/v1/brain/:shareLink', async (req,res)=>{
      const hash = req.params.shareLink
 
     //find the link form hash

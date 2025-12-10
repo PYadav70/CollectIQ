@@ -25,7 +25,7 @@ export const contentModel = model("Content", ContentSchema);
 
 // link schema
 const LinkShare = new Schema({
-    hash: String,
+    hash: String, //unique string generate to the user
     userId: [{ type: mongoose.Types.ObjectId, ref: 'User', required: true, unique: true }],
 })
 
