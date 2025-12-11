@@ -17,27 +17,27 @@ app.use(cors())
 
 const PORT = process.env.PORT || 3000
 
-app.post('/api/v1/signup', async(req,res)=>{
-    const {username,password} = req.body;
+app.post('/api/v1/signup', async (req, res) => {
+    const { username, password } = req.body;
 
-    if(!username || !password){
+    if (!username || !password) {
         return res.status(400).json({
-            msg:"missing input"
+            msg: "missing input"
         })
     }
     try {
         const salt = await bcrypt.genSalt(5);
-        const hashPassword = await bcrypt.hash(password,salt)
+        const hashPassword = await bcrypt.hash(password, salt)
 
         await userModel.create({
-            username:username,
-            password:hashPassword
+            username: username,
+            password: hashPassword
         })
-         return res.status(200).json({
+        return res.status(200).json({
             msg: "Signed up"
         })
-    } catch (error:any) {
-         if (error.code === 11000) {
+    } catch (error: any) {
+        if (error.code === 11000) {
             // duplicate username
             return res.status(409).json({
                 msg: "User already exists"
@@ -51,30 +51,29 @@ app.post('/api/v1/signup', async(req,res)=>{
             error: error.message
         });
     }
-    
 })
 
 
-app.post('/api/v1/signin', async(req,res)=>{
+app.post('/api/v1/signin', async (req, res) => {
     try {
         const username = req.body.username
         const password = req.body.password
 
-        if(!username || !password){
+        if (!username || !password) {
             return res.status(401).json({
-                msg:"username and password required"
+                msg: "username and password required"
             })
         }
         const user = await userModel.findOne({
             username
         })
-          if (!user) {
+        if (!user) {
             return res.status(404).json({
                 msg: "User not found"
             })
         }
 
-          const isPasswordCorrect = await bcrypt.compare(password, user.password)
+        const isPasswordCorrect = await bcrypt.compare(password, user.password)
 
         if (!isPasswordCorrect) {
             return res.status(401).json({
@@ -86,14 +85,14 @@ app.post('/api/v1/signin', async(req,res)=>{
             id: user._id,
             username: user.username
 
-        },JWT_SECRET)
+        }, JWT_SECRET)
 
-         return res.status(200).json({
+        return res.status(200).json({
             msg: "Login successful",
             token,
         });
     } catch (error) {
-         console.log("Signin error");
+        console.log("Signin error");
 
         return res.status(411).json({
             msg: "Something went wrong",
@@ -103,42 +102,42 @@ app.post('/api/v1/signin', async(req,res)=>{
 })
 
 app.post('/api/v1/content', userMiddleware, async (req, res) => {
-  try {
-    const { title, link, type, details, tags } = req.body;
+    try {
+        const { title, link, type, details, tags } = req.body;
 
-    if (!link || !type) {
-      return res.status(400).json({ msg: "link and type are required" });
+        if (!link || !type) {
+            return res.status(400).json({ msg: "link and type are required" });
+        }
+
+        const content = await contentModel.create({
+            title: title || "",                // keep optional for now
+            link,
+            type,
+            details: details || "",
+            // use tags from frontend if it's an array, otherwise []
+            tags: Array.isArray(tags) ? tags : [],
+            status: "to-learn",
+            // @ts-ignore
+            userId: req.userId,
+        });
+
+        return res.status(201).json({
+            msg: "content added",
+            content,
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ msg: "Failed to add content" });
     }
-
-    const content = await contentModel.create({
-      title: title || "",                // keep optional for now
-      link,
-      type,
-      details: details || "",
-      // use tags from frontend if it's an array, otherwise []
-      tags: Array.isArray(tags) ? tags : [],
-      status: "to-learn",
-      // @ts-ignore
-      userId: req.userId,
-    });
-
-    return res.status(201).json({
-      msg: "content added",
-      content,
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "Failed to add content" });
-  }
 });
 
 // fetch the data
-app.get('/api/v1/content',userMiddleware, async(req,res)=>{
-     //@ts-ignore
+app.get('/api/v1/content', userMiddleware, async (req, res) => {
+    //@ts-ignore
     const userId = req.userId
     const content = await contentModel.find({
         userId: userId
-    }).populate("userId","username")
+    }).populate("userId", "username")
 
     res.json({
         content
@@ -147,93 +146,93 @@ app.get('/api/v1/content',userMiddleware, async(req,res)=>{
 
 // update add status
 app.patch('/api/v1/content/:id/status', userMiddleware, async (req, res) => {
-  const contentId = req.params.id;
-  const { status } = req.body;
+    const contentId = req.params.id;
+    const { status } = req.body;
 
-  const valid = ["to-learn", "in-progress", "done"];
-  if (!valid.includes(status)) {
-    return res.status(400).json({ msg: "Invalid status value" });
-  }
+    const valid = ["to-learn", "in-progress", "done"];
+    if (!valid.includes(status)) {
+        return res.status(400).json({ msg: "Invalid status value" });
+    }
 
-  const updated = await contentModel.findOneAndUpdate(
-    //@ts-ignore
-    { _id: contentId, userId: req.userId },
-    { status },
-    { new: true }
-  );
+    const updated = await contentModel.findOneAndUpdate(
+        //@ts-ignore
+        { _id: contentId, userId: req.userId },
+        { status },
+        { new: true }
+    );
 
-  if (!updated) {
-    return res.status(404).json({ msg: "Content not found" });
-  }
+    if (!updated) {
+        return res.status(404).json({ msg: "Content not found" });
+    }
 
-  res.json({
-    msg: "Status updated",
-    content: updated
-  });
+    res.json({
+        msg: "Status updated",
+        content: updated
+    });
 });
 
 
-// DELETE /api/v1/content/:id
+// DELETE post
 app.delete('/api/v1/content/:id', userMiddleware, async (req, res) => {
-  // id from URL
-  const contentId = req.params.id;
+    // id from URL
+    const contentId = req.params.id;
 
-  try {
-    const result = await contentModel.deleteOne({
-      _id: contentId,
-      // @ts-ignore
-      userId: req.userId,
-    });
+    try {
+        const result = await contentModel.deleteOne({
+            _id: contentId,
+            // @ts-ignore
+            userId: req.userId,
+        });
 
-    if (result.deletedCount === 0) {
-      return res.status(404).json({
-        msg: "Content not found or not owned by user",
-      });
+        if (result.deletedCount === 0) {
+            return res.status(404).json({
+                msg: "Content not found or not owned by user",
+            });
+        }
+
+        return res.json({
+            msg: "content deleted",
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            msg: "Failed to delete content",
+        });
     }
-
-    return res.json({
-      msg: "content deleted",
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({
-      msg: "Failed to delete content",
-    });
-  }
 });
 
 // updating the content
-app.put('/api/v1/content/:id', userMiddleware,async(req,res)=>{
+app.put('/api/v1/content/:id', userMiddleware, async (req, res) => {
     const contentId = req.params.id;
-    const {title, link, type, details, tags} = req.body;
+    const { title, link, type, details, tags } = req.body;
 
     try {
         const Update: any = {};
 
-        if(title !== undefined) Update.title = title;
-        if(link !== undefined) Update.link = link;
-        if(type !== undefined) Update.type = type;
-        if(details !== undefined) Update.details = details;
-        if(tags !== undefined) Update.tags = tags;
+        if (title !== undefined) Update.title = title;
+        if (link !== undefined) Update.link = link;
+        if (type !== undefined) Update.type = type;
+        if (details !== undefined) Update.details = details;
+        if (tags !== undefined) Update.tags = tags;
 
         const updated = await contentModel.findByIdAndUpdate(
             //@ts-ignore
-            {_id: contentId, userId: req.userId},
+            { _id: contentId, userId: req.userId },
             Update,
-            {new:true}
+            { new: true }
         );
-        if(!updated){
-            return res.status(404).json({msg:"content not found"});
+        if (!updated) {
+            return res.status(404).json({ msg: "content not found" });
         }
-        res.json({msg:"content updated", content:updated})
+        res.json({ msg: "content updated", content: updated })
     } catch (error) {
         console.log(error);
-        res.status(500).json({msg:"failed to update content"});
+        res.status(500).json({ msg: "failed to update content" });
     }
 })
 
 
-app.post('/api/v1/brain/share',userMiddleware,async (req,res)=>{
+app.post('/api/v1/brain/share', userMiddleware, async (req, res) => {
     const share = req.body.share;
     try {
         if (share) {
@@ -278,8 +277,8 @@ app.post('/api/v1/brain/share',userMiddleware,async (req,res)=>{
 })
 
 
-app.get('/api/v1/brain/:shareLink', async (req,res)=>{
-     const hash = req.params.shareLink
+app.get('/api/v1/brain/:shareLink', async (req, res) => {
+    const hash = req.params.shareLink
 
     //find the link form hash
     const link = await linkModel.findOne({
@@ -313,7 +312,7 @@ app.get('/api/v1/brain/:shareLink', async (req,res)=>{
     })
 })
 
-app.listen(PORT, ()=>{
+app.listen(PORT, () => {
     console.log(`surver is running at: ${PORT}`)
 })
 

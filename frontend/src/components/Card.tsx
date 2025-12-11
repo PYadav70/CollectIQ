@@ -1,4 +1,4 @@
-// src/components/Card.tsx
+
 import { useEffect, useRef } from "react";
 import ShareIcon from "../icons/ShareIcon";
 import { DeleteIcon } from "../icons/DeleteIcon";
@@ -62,7 +62,7 @@ export const Card = ({
 
   const handleShare = () => {
     if (onShare) return onShare(link);
-    navigator?.clipboard?.writeText(link).catch(() => {});
+    navigator?.clipboard?.writeText(link).catch(() => { });
   };
 
   return (
@@ -75,10 +75,10 @@ export const Card = ({
           <p className="font-semibold truncate" title={title}>{title}</p>
         </div>
 
-        <div className="flex gap-3 shrink-0">
-          <button onClick={handleShare}><ShareIcon size="lg" /></button>
-          <button onClick={onEdit}><EditIcon size="lg" /></button>
-          <button onClick={onDelete}><DeleteIcon size="lg" /></button>
+        <div className="flex gap-3 shrink-0 ">
+          <button className="cursor-pointer" onClick={handleShare}><ShareIcon size="lg" /></button>
+          <button className="cursor-pointer" onClick={onEdit}><EditIcon size="lg" /></button>
+          <button className="cursor-pointer" onClick={onDelete}><DeleteIcon size="lg" /></button>
         </div>
       </div>
 
