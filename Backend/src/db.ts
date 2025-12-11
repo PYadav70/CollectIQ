@@ -1,32 +1,78 @@
 import mongoose, { model, Schema } from "mongoose";
 
-mongoose.connect('mongodb://localhost:27017/secondBrain')
-    .then(() => console.log("db connected")
-    )
-// user schema
-    const userSchema = new Schema({
-        username:{type:String,unique:true, required:true,},
-        password:{type:String, required:true}
+mongoose
+  .connect("mongodb://localhost:27017/collectIQ")
+  .then(() => console.log("db connected"))
+  .catch((err) => console.error("db connection error:", err));
 
-    })
-
-    export const userModel = model("User",userSchema);
-
-// content schema
-    const ContentSchema = new Schema({
-    title: String,
-    link: String,
-    tags: [{ type: mongoose.Types.ObjectId, ref: 'Tag' }],
+//  User schema 
+const userSchema = new Schema({
+  username: {
     type: String,
-    userId: [{ type: mongoose.Types.ObjectId, ref: 'User', required: true }],
-})
+    unique: true,
+    required: true,
+    trim: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+});
 
-export const contentModel = model("Content", ContentSchema);
+export const userModel = model("User", userSchema);
 
-// link schema
-const LinkShare = new Schema({
-    hash: String, //unique string generate to the user
-    userId: [{ type: mongoose.Types.ObjectId, ref: 'User', required: true, unique: true }],
-})
+// Content schema
+// We keep tags as simple strings: ["AI", "DSA", "WebDev"]
+const contentSchema = new Schema(
+  {
+    title: { type: String, required: true },
+    link: { type: String, required: true },
+    details: { type: String, default: "" },
+    status: {
+    type: String,
+    enum: ["to-learn", "in-progress", "done"],
+    default: "to-learn",
+  },
+   // tag
+    tags: {
+      type: [String],
+      default: [],
+    },
 
-export const linkModel = model("model", LinkShare)
+    type: {
+      type: String,
+      required: true, // "youtube" | "twitter" | "note" | "links" | "notion"
+    },
+
+    // single user, not array
+    userId: {
+      type: mongoose.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  },
+  { timestamps: true }
+  
+);
+
+export const contentModel = model("Content", contentSchema);
+
+//Link share schema
+const linkShareSchema = new Schema(
+  {
+    hash: {
+      type: String,
+      required: true,
+      unique: true, // each shared brain link is unique
+    },
+    userId: {
+      type: mongoose.Types.ObjectId,
+      ref: "User",
+      required: true,
+      unique: true, // one share link per user
+    },
+  },
+  { timestamps: true }
+);
+
+export const linkModel = model("LinkShare", linkShareSchema);

@@ -1,4 +1,4 @@
-import { type FormEvent, useRef } from "react";
+import { type FormEvent, useRef, useState } from "react";
 import { CrossIcon } from "../icons/CrossIcon";
 import { Button } from "./Button";
 import { Input } from "./Input";
@@ -10,33 +10,63 @@ interface CreateContentModelProps {
   onClose: () => void;
 }
 
+// Predefined tags for Day 1
+const TAG_OPTIONS = ["AI", "DSA", "WebDev", "English", "Productivity"];
+
 export const CreateContentModel = ({ open, onClose }: CreateContentModelProps) => {
-  const titleRef = useRef<HTMLInputElement>(null as any);
-  const linkRef = useRef<HTMLInputElement>(null as any);
-  const typeRef = useRef<HTMLInputElement>(null as any);
-  const detailsRef = useRef<HTMLInputElement>(null as any);
+  const titleRef = useRef<HTMLInputElement>(null!);
+  const linkRef = useRef<HTMLInputElement>(null!);
+  const typeRef = useRef<HTMLSelectElement>(null!);
+  const detailsRef = useRef<HTMLInputElement>(null!);
+
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   if (!open) return null;
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  };
 
   const addContent = async (e?: FormEvent) => {
     if (e) e.preventDefault();
     const token = localStorage.getItem("token");
-
     if (!token) return;
 
-    const title = titleRef.current?.value;
-    const link = linkRef.current?.value;
-    const type = typeRef.current?.value;
-    const details = detailsRef.current?.value;
+    const title = titleRef.current?.value?.trim();
+    const link = linkRef.current?.value?.trim();
+    const type = typeRef.current?.value?.trim();
+    const details = detailsRef.current?.value?.trim();
+
+    if (!title || !link || !type) {
+      alert("Please fill Title, Link and Type");
+      return;
+    }
 
     try {
       await axios.post(
         `${BACKEND_URL}/api/v1/content`,
-        { title, link, type, details },
+        {
+          title,
+          link,
+          type,
+          details,
+          tags: selectedTags, //  send tags to backend
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
+      // reset fields
+      if (titleRef.current) titleRef.current.value = "";
+      if (linkRef.current) linkRef.current.value = "";
+      if (typeRef.current) typeRef.current.value = "";
+      if (detailsRef.current) detailsRef.current.value = "";
+      setSelectedTags([]);
+
       onClose();
-    } catch {
+    } catch (err) {
+      console.error(err);
       alert("Failed to create content");
     }
   };
@@ -69,18 +99,53 @@ export const CreateContentModel = ({ open, onClose }: CreateContentModelProps) =
         </h2>
 
         {/* Form */}
-        <form onSubmit={addContent} className="flex flex-col gap-4">
-          <Input reference={titleRef} type="text" placeholder="Title*" />
-          <Input reference={linkRef} type="url" placeholder="Link*" />
-          <Input reference={typeRef} type="text" placeholder="Type* (youtube, twitter, links...)" />
-          <Input reference={detailsRef} type="text" placeholder="Details (optional)" />
+       <form onSubmit={addContent} className="flex flex-col gap-4 w-full">
+      <Input inputRef={titleRef} type="text" placeholder="Title" />
+      <Input inputRef={linkRef} type="url" placeholder="Link" />
 
+  {/* Dropdown instead of text input */}
+  <select
+    ref={typeRef}
+    className="w-full px-6 py-3 border rounded-lg outline-none cursor-pointer bg-white"
+    defaultValue="youtube"
+  >
+    <option value="youtube">YouTube</option>
+    <option value="twitter">Twitter</option>
+    <option value="links">Links</option>
+    <option value="note">Note</option>
+    <option value="notion">Notion</option>
+  </select>
+
+  <Input inputRef={detailsRef} type="text" placeholder="Details" />
+
+          {/* TAGS SECTION */}
           <div className="mt-2">
-            <Button
-              onClick={addContent}
-              variant="primary"
-              text="Submit"
-            />
+            <p className="text-xs font-semibold text-slate-600 mb-2">
+              Tags (optional)
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {TAG_OPTIONS.map((tag) => {
+                const active = selectedTags.includes(tag);
+                return (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => toggleTag(tag)}
+                    className={`px-3 py-1 rounded-full border text-xs font-medium transition-colors ${
+                      active
+                        ? "bg-purple-600 border-purple-600 text-white"
+                        : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    #{tag}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <Button onClick={addContent} variant="primary" text="Submit" />
           </div>
         </form>
       </div>

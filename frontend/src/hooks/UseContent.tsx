@@ -1,14 +1,16 @@
-// src/hooks/UseContent.ts
+// src/hooks/useContent.ts
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { BACKEND_URL } from "../config";
 
 export interface Content {
-  _id: string;         // change to id/content if your backend uses that
-  title: string;
+  _id: string;
+  title?: string;
   link: string;
   type: "twitter" | "youtube" | "note" | "links" | "notion";
-  detail?: string;
+  details?: string;
+  tags?: string[];
+   status: "to-learn" | "in-progress" | "done";  //status update
 }
 
 export function useContent() {

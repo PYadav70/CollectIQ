@@ -6,37 +6,42 @@ import { YouTubeIcon } from "../icons/YoutubeIcon";
 import { TwitterIcon } from "../icons/TwitterIcon";
 import { NoteIcon } from "../icons/NoteIcon";
 import { LinkIcon } from "../icons/LinkIcon";
-import { PlusIcon } from "../icons/PlusIcon";
 import { NotionIcon } from "../icons/NotionIcon";
+import { EditIcon } from "../icons/EditIcon";
+
+const statusColors: any = {
+  "to-learn": "bg-purple-100 text-purple-700",
+  "in-progress": "bg-yellow-100 text-yellow-700",
+  "done": "bg-green-100 text-green-700",
+};
+
 
 interface CardProps {
   title: string;
   link: string;
   type: "twitter" | "youtube" | "note" | "links" | "notion";
   detail?: string;
+  tags?: string[];
   onDelete?: () => void;
   onShare?: (link: string) => void;
+  onTagClick?: (tag: string) => void;
+  onEdit?: () => void;
+  status: "to-learn" | "in-progress" | "done";
+  onStatusChange?: (newStatus: string) => void;
 }
 
-function getYouTubeEmbedUrl(url: string): string {
-  if (url.includes("embed")) return url;
-
-  try {
-    if (url.includes("watch?v=")) {
-      const id = new URL(url).searchParams.get("v");
-      return `https://www.youtube.com/embed/${id}`;
-    }
-    if (url.includes("youtu.be/")) {
-      const id = url.split("youtu.be/")[1];
-      return `https://www.youtube.com/embed/${id}`;
-    }
-  } catch {
-    return "";
-  }
-  return "";
-}
-
-export const Card = ({ title, link, type, detail, onDelete, onShare }: CardProps) => {
+export const Card = ({
+  title,
+  link,
+  type,
+  detail,
+  tags,
+  onDelete,
+  onShare,
+  onEdit,
+  status,
+  onStatusChange
+}: CardProps) => {
   const twitterRef = useRef<HTMLDivElement>(null);
 
   const iconMap = {
@@ -45,14 +50,11 @@ export const Card = ({ title, link, type, detail, onDelete, onShare }: CardProps
     note: <NoteIcon size="lg" />,
     notion: <NotionIcon size="lg" />,
     links: <LinkIcon size="lg" />,
-    share: <ShareIcon size="lg" />,
-    delete: <DeleteIcon size="lg" />,
-    plus: <PlusIcon size="lg" />,
   };
 
   useEffect(() => {
-    if (type === "twitter" && window?.twttr?.widgets) {
-      window.twttr.widgets.load(twitterRef.current);
+    if (type === "twitter" && (window as any)?.twttr?.widgets) {
+      (window as any).twttr.widgets.load(twitterRef.current);
     }
   }, [type, link]);
 
@@ -60,65 +62,83 @@ export const Card = ({ title, link, type, detail, onDelete, onShare }: CardProps
 
   const handleShare = () => {
     if (onShare) return onShare(link);
-    if (navigator?.clipboard) {
-      navigator.clipboard.writeText(link).catch(() => {});
-    }
+    navigator?.clipboard?.writeText(link).catch(() => {});
   };
 
   return (
-    <div className="flex flex-col border border-slate-300 h-auto w-80 overflow-hidden rounded-lg mt-5 ml-5 my-5 py-3 px-5 shadow-md">
+    <div className="flex flex-col border border-slate-300 h-auto w-80 overflow-hidden rounded-xl mt-5 ml-5 my-5 py-3 px-5 shadow-md bg-white">
+
       {/* Header */}
-      <div className="flex justify-between">
-        <div className="flex gap-3">
+      <div className="flex justify-between gap-2">
+        <div className="flex gap-3 min-w-0">
           {iconMap[type]}
-          <p className="font-semibold">{title}</p>
+          <p className="font-semibold truncate" title={title}>{title}</p>
         </div>
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={handleShare}
-            className="cursor-pointer hover:text-slate-700"
-          >
-            <ShareIcon size="lg" />
-          </button>
-          <button
-            type="button"
-            onClick={onDelete}
-            className="cursor-pointer hover:text-red-600"
-          >
-            <DeleteIcon size="lg" />
-          </button>
+
+        <div className="flex gap-3 shrink-0">
+          <button onClick={handleShare}><ShareIcon size="lg" /></button>
+          <button onClick={onEdit}><EditIcon size="lg" /></button>
+          <button onClick={onDelete}><DeleteIcon size="lg" /></button>
         </div>
       </div>
 
+      {/*  STATUS SECTION HERE */}
+      <div className="flex items-center gap-2 mt-2">
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status]}`}>
+          {status.replace("-", " ")}
+        </span>
+
+        <button
+          className="text-xs px-2 py-1 border rounded-lg hover:bg-slate-100"
+          onClick={() => {
+            const cycle = {
+              "to-learn": "in-progress",
+              "in-progress": "done",
+              "done": "to-learn",
+            };
+            onStatusChange?.(cycle[status]);
+          }}
+        >
+          ⟳
+        </button>
+      </div>
+
       {/* Content */}
-      <div className="w-full h-auto mt-2 mb-2">
+      <div className="w-full h-auto mt-3 mb-2 space-y-2">
         {type === "youtube" && (
           <iframe
-            className="rounded-2xl min-h-72 w-full mt-5"
-            src={getYouTubeEmbedUrl(link)}
+            className="rounded-2xl min-h-72 w-full"
+            src={link.replace("watch?v=", "embed/")}
             title="YouTube video player"
-            frameBorder={0}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
             allowFullScreen
-          ></iframe>
+          />
         )}
 
         {type === "twitter" && (
-          <div ref={twitterRef}>
-            <blockquote className="twitter-tweet">
+          <div ref={twitterRef} className="rounded-xl bg-slate-50 border border-slate-200 overflow-hidden">
+            <blockquote className="twitter-tweet m-0 p-2">
               <a href={normalizedLink}></a>
             </blockquote>
           </div>
         )}
 
         {type === "note" && (
-          <div className="p-3 h-full border border-slate-200 rounded-lg bg-slate-300 text-sm text-gray-700">
-            <p className="break-words">{detail || link}</p>
+          <div className="p-3 border border-slate-200 rounded-lg bg-slate-50 text-sm text-gray-700">
+            <p>{detail || link}</p>
           </div>
         )}
       </div>
+
+      {/* Tags */}
+      {tags && tags.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-2">
+          {tags.map((t) => (
+            <span key={t} className="bg-slate-100 px-2 py-1 rounded-full text-[11px] font-medium text-slate-700">
+              #{t}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

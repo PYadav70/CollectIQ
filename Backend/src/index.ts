@@ -1,5 +1,4 @@
 import express from "express";
-import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import { random } from "./utils.js";
 import bcrypt from "bcrypt"
@@ -103,23 +102,37 @@ app.post('/api/v1/signin', async(req,res)=>{
     }
 })
 
-app.post('/api/v1/content',userMiddleware, async(req,res)=>{
-     const link = req.body.link;
-     const type = req.body.type;
+app.post('/api/v1/content', userMiddleware, async (req, res) => {
+  try {
+    const { title, link, type, details, tags } = req.body;
 
-    await contentModel.create({
-        link,
-        type,
-        //@ts-ignore-
-        userId: req.userId,
-        tags: []
-    })
+    if (!link || !type) {
+      return res.status(400).json({ msg: "link and type are required" });
+    }
 
-   return res.json({
-        msg: "content added"
-    })
-})
+    const content = await contentModel.create({
+      title: title || "",                // keep optional for now
+      link,
+      type,
+      details: details || "",
+      // use tags from frontend if it's an array, otherwise []
+      tags: Array.isArray(tags) ? tags : [],
+      status: "to-learn",
+      // @ts-ignore
+      userId: req.userId,
+    });
 
+    return res.status(201).json({
+      msg: "content added",
+      content,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Failed to add content" });
+  }
+});
+
+// fetch the data
 app.get('/api/v1/content',userMiddleware, async(req,res)=>{
      //@ts-ignore
     const userId = req.userId
@@ -132,19 +145,93 @@ app.get('/api/v1/content',userMiddleware, async(req,res)=>{
     })
 })
 
-app.delete('/api/v1/content',userMiddleware, async(req,res)=>{
-     const contentId = req.body.contentId
+// update add status
+app.patch('/api/v1/content/:id/status', userMiddleware, async (req, res) => {
+  const contentId = req.params.id;
+  const { status } = req.body;
 
-    await contentModel.deleteMany({
-        contentId,
-        //@ts-ignore
-        userId: req.userId
-    })
+  const valid = ["to-learn", "in-progress", "done"];
+  if (!valid.includes(status)) {
+    return res.status(400).json({ msg: "Invalid status value" });
+  }
 
-    res.json({
-        msg: "content deleted"
-    })
+  const updated = await contentModel.findOneAndUpdate(
+    //@ts-ignore
+    { _id: contentId, userId: req.userId },
+    { status },
+    { new: true }
+  );
+
+  if (!updated) {
+    return res.status(404).json({ msg: "Content not found" });
+  }
+
+  res.json({
+    msg: "Status updated",
+    content: updated
+  });
+});
+
+
+// DELETE /api/v1/content/:id
+app.delete('/api/v1/content/:id', userMiddleware, async (req, res) => {
+  // id from URL
+  const contentId = req.params.id;
+
+  try {
+    const result = await contentModel.deleteOne({
+      _id: contentId,
+      // @ts-ignore
+      userId: req.userId,
+    });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        msg: "Content not found or not owned by user",
+      });
+    }
+
+    return res.json({
+      msg: "content deleted",
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      msg: "Failed to delete content",
+    });
+  }
+});
+
+// updating the content
+app.put('/api/v1/content/:id', userMiddleware,async(req,res)=>{
+    const contentId = req.params.id;
+    const {title, link, type, details, tags} = req.body;
+
+    try {
+        const Update: any = {};
+
+        if(title !== undefined) Update.title = title;
+        if(link !== undefined) Update.link = link;
+        if(type !== undefined) Update.type = type;
+        if(details !== undefined) Update.details = details;
+        if(tags !== undefined) Update.tags = tags;
+
+        const updated = await contentModel.findByIdAndUpdate(
+            //@ts-ignore
+            {_id: contentId, userId: req.userId},
+            Update,
+            {new:true}
+        );
+        if(!updated){
+            return res.status(404).json({msg:"content not found"});
+        }
+        res.json({msg:"content updated", content:updated})
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({msg:"failed to update content"});
+    }
 })
+
 
 app.post('/api/v1/brain/share',userMiddleware,async (req,res)=>{
     const share = req.body.share;
