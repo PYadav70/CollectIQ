@@ -28,6 +28,8 @@ interface CardProps {
   onEdit?: () => void;
   status: "to-learn" | "in-progress" | "done";
   onStatusChange?: (newStatus: string) => void;
+  isPinned: boolean;
+  onPin?: ()=>void; 
 }
 
 export const Card = ({
@@ -40,7 +42,9 @@ export const Card = ({
   onShare,
   onEdit,
   status,
-  onStatusChange
+  onStatusChange,
+  onPin,
+  isPinned
 }: CardProps) => {
   const twitterRef = useRef<HTMLDivElement>(null);
 
@@ -76,6 +80,7 @@ export const Card = ({
         </div>
 
         <div className="flex gap-3 shrink-0 ">
+          <button onClick={onPin}>{isPinned ? "⭐" : "☆"}</button>
           <button className="cursor-pointer" onClick={handleShare}><ShareIcon size="lg" /></button>
           <button className="cursor-pointer" onClick={onEdit}><EditIcon size="lg" /></button>
           <button className="cursor-pointer" onClick={onDelete}><DeleteIcon size="lg" /></button>

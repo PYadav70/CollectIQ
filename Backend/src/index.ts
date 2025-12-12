@@ -172,6 +172,30 @@ app.patch('/api/v1/content/:id/status', userMiddleware, async (req, res) => {
     });
 });
 
+// API ENDPOINT FOR TOGGLE PIN
+app.patch('/api/v1/content/:id/pin', userMiddleware, async (req, res) => {
+  const contentId = req.params.id;
+
+  const content = await contentModel.findOne({
+    _id: contentId,
+    //@ts-ignore
+    userId: req.userId
+  });
+
+  if (!content) {
+    return res.status(404).json({ msg: "Content not found" });
+  }
+
+  content.isPinned = !content.isPinned;
+  await content.save();
+
+  res.json({
+    msg: "Pin updated",
+    content
+  });
+});
+
+
 
 // DELETE post
 app.delete('/api/v1/content/:id', userMiddleware, async (req, res) => {

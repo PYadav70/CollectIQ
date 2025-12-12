@@ -32,6 +32,8 @@ const contentSchema = new Schema(
     enum: ["to-learn", "in-progress", "done"],
     default: "to-learn",
   },
+   // pinned or unpinned
+   isPinned: { type: Boolean, default: false },
    // tag
     tags: {
       type: [String],

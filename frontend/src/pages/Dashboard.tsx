@@ -1,4 +1,4 @@
-// src/pages/Dashboard.tsx
+
 import { useState } from "react";
 import { Button } from "../components/Button";
 import { PlusIcon } from "../icons/PlusIcon";
@@ -13,6 +13,11 @@ import type { Content } from "../hooks/UseContent";
 import { useContent } from "../hooks/UseContent";
 import axios from "axios";
 import { BACKEND_URL } from "../config";
+
+type RowContent = Content & {
+  isPinned?: boolean;
+  details?: string;
+};
 
 function Dashboard() {
   const [modelOpen, setModelOpen] = useState(false);
@@ -43,8 +48,57 @@ function Dashboard() {
     }
   };
 
-  //  UPDATE STATUS (To Learn → In Progress → Done)
-  const updateStatus = async (id: string, newStatus: "to-learn" | "in-progress" | "done") => {
+  // toggle pin
+  const togglePin = async (id: string) => {
+    if (!token) {
+      alert("You're not logged in");
+      return;
+    }
+
+    // optimistic: flip locally immediately
+    setContents((prev) =>
+      prev.map((c) =>
+        c._id === id ? { ...c, isPinned: !((c as any).isPinned) } : c
+      )
+    );
+
+    try {
+      const res = await axios.patch(
+        `${BACKEND_URL}/api/v1/content/${id}/pin`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const updated = res.data.content as RowContent;
+
+      // reconcile with server response
+      setContents((prev) => prev.map((c) => (c._id === id ? updated : c)));
+    } catch (err) {
+      // revert optimistic change if error
+      setContents((prev) =>
+        prev.map((c) =>
+          c._id === id ? { ...c, isPinned: !(c as any).isPinned } : c
+        )
+      );
+      alert("Failed to update pin");
+    }
+  };
+
+  // UPDATE STATUS (To Learn → In Progress → Done)
+  const updateStatus = async (
+    id: string,
+    newStatus: "to-learn" | "in-progress" | "done"
+  ) => {
+    if (!token) {
+      alert("You're not logged in");
+      return;
+    }
+
+    // optimistic update
+    setContents((prev) => prev.map((c) => (c._id === id ? { ...c, status: newStatus } : c)));
+
     try {
       await axios.patch(
         `${BACKEND_URL}/api/v1/content/${id}/status`,
@@ -53,14 +107,9 @@ function Dashboard() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
-      // Update UI
-      setContents((prev) =>
-        prev.map((c) =>
-          c._id === id ? { ...c, status: newStatus } : c
-        )
-      );
     } catch (err) {
+      // revert on error (could re-fetch too)
+      setContents((prev) => prev.map((c) => (c._id === id ? { ...c, status: "to-learn" } : c)));
       alert("Failed to update status");
     }
   };
@@ -71,11 +120,7 @@ function Dashboard() {
   };
 
   // ALL UNIQUE TAGS
-  const allTags = Array.from(
-    new Set(
-      contents.flatMap((c) => c.tags || [])
-    )
-  ).filter(Boolean);
+  const allTags = Array.from(new Set(contents.flatMap((c) => c.tags || []))).filter(Boolean);
 
   // FILTER CONTENT
   const filteredContents = contents.filter((item) => {
@@ -97,14 +142,17 @@ function Dashboard() {
     );
   });
 
+  // ⭐ Sort pinned items to the top
+  const sortedContents = [...filteredContents].sort((a, b) => {
+    const ai = (a as RowContent).isPinned ? 1 : 0;
+    const bi = (b as RowContent).isPinned ? 1 : 0;
+    return bi - ai; // pinned first
+  });
+
   return (
     <div className="h-screen flex justify-center lg:justify-normal">
-
       {/* Sidebar */}
-      <Sidebar
-        activeFilter={activeFilter}
-        onFilterChange={(type) => setActiveFilter(type)}
-      />
+      <Sidebar activeFilter={activeFilter} onFilterChange={(type) => setActiveFilter(type)} />
 
       {/* EDIT MODAL */}
       <EditContentModal
@@ -112,11 +160,7 @@ function Dashboard() {
         content={editingContent}
         onClose={() => setEditingContent(null)}
         onUpdated={(updated) => {
-          setContents((prev) =>
-            prev.map((c) =>
-              c._id === updated._id ? updated : c
-            )
-          );
+          setContents((prev) => prev.map((c) => (c._id === updated._id ? updated : c)));
         }}
       />
 
@@ -165,10 +209,9 @@ function Dashboard() {
               <>
                 <button
                   onClick={() => setActiveTag(null)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border ${activeTag === null
-                      ? "bg-slate-900 text-white border-slate-900"
-                      : "bg-white text-slate-700 border-slate-200"
-                    }`}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                    activeTag === null ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-700 border-slate-200"
+                  }`}
                 >
                   All tags
                 </button>
@@ -177,10 +220,9 @@ function Dashboard() {
                   <button
                     key={tag}
                     onClick={() => handleTagClick(tag)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium border ${activeTag === tag
-                        ? "bg-purple-600 text-white border-purple-600"
-                        : "bg-white text-slate-700 border-slate-200"
-                      }`}
+                    className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                      activeTag === tag ? "bg-purple-600 text-white border-purple-600" : "bg-white text-slate-700 border-slate-200"
+                    }`}
                   >
                     #{tag}
                   </button>
@@ -196,15 +238,14 @@ function Dashboard() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search title, link, tags..."
-              className="w-full px-3 py-2 text-sm rounded-full border border-slate-200 outline-none 
-              focus:ring-2 focus:ring-purple-500"
+              className="w-full px-3 py-2 text-sm rounded-full border border-slate-200 outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
         </div>
 
         {/* CONTENT CARDS */}
         <div className="flex justify-around items-center flex-col sm:flex-row flex-wrap">
-          {filteredContents.map((item) => (
+          {sortedContents.map((item) => (
             <Card
               key={item._id}
               title={item.title || ""}
@@ -212,17 +253,17 @@ function Dashboard() {
               type={item.type}
               detail={item.details}
               tags={item.tags}
-              status={item.status || "to-learn"}  // changing the item status
+              status={item.status || "to-learn"}
+              isPinned={(item as RowContent).isPinned || false}
+              onPin={() => togglePin(item._id)}
               //@ts-ignore
-              onStatusChange={(s) => updateStatus(item._id, s)}  //
+              onStatusChange={(s) => updateStatus(item._id, s)}
               onDelete={() => handleDelete(item._id)}
               onTagClick={handleTagClick}
               onEdit={() => setEditingContent(item)}
             />
-
           ))}
         </div>
-
       </div>
     </div>
   );
