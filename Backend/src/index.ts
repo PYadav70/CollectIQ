@@ -111,7 +111,7 @@ app.post('/api/v1/content', userMiddleware, async (req, res) => {
         }
 
         const content = await contentModel.create({
-            title: title || "",                // keep optional for now
+            title: title || "",                
             link,
             type,
             details: details || "",
@@ -173,7 +173,7 @@ app.patch('/api/v1/content/:id/status', userMiddleware, async (req, res) => {
 });
 
 // API ENDPOINT FOR TOGGLE PIN
-app.patch('/api/v1/content/:id/pin', userMiddleware, async (req, res) => {
+ app.patch('/api/v1/content/:id/pin', userMiddleware, async (req, res) => {
   const contentId = req.params.id;
 
   const content = await contentModel.findOne({
@@ -194,7 +194,6 @@ app.patch('/api/v1/content/:id/pin', userMiddleware, async (req, res) => {
     content
   });
 });
-
 
 
 // DELETE post
