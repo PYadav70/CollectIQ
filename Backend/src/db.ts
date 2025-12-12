@@ -22,7 +22,6 @@ const userSchema = new Schema({
 export const userModel = model("User", userSchema);
 
 // Content schema
-// We keep tags as simple strings: ["AI", "DSA", "WebDev"]
 const contentSchema = new Schema(
   {
     title: { type: String, required: true },

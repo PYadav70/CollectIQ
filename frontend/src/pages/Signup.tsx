@@ -52,8 +52,8 @@ export const Signup = () => {
                 <CrossIcon size="lg" />
             </div>
             <div className="flex flex-col justify-center gap-5 mb-2">
-                <Input type="text" reference={usernameRef} placeholder="Username" />
-                <Input type="passowrd" reference={passwordRef} placeholder="Password" />
+                <Input type="text" inputRef={usernameRef} placeholder="Username" />
+                <Input type="passowrd" inputRef={passwordRef} placeholder="Password" />
                 <Button onClick={signup}
                     loading={false} variant="primary" text="Signup" />
             </div>

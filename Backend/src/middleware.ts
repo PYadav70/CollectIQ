@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "./config.js"; // adjust path if needed
+import { JWT_SECRET } from "./config.js"; 
 
 // lightweight local extension if you don't want global augmentation
 type ReqWithUser = Request & { userId?: string };

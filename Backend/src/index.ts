@@ -3,19 +3,20 @@ import jwt from "jsonwebtoken";
 import { random } from "./utils.js";
 import bcrypt from "bcrypt"
 import { contentModel, linkModel, userModel } from "./db.js";
-import { JWT_SECRET } from "./config.js";
 import dotenv from 'dotenv';
 import { userMiddleware } from "./middleware.js";
 import cors from 'cors'
+import { JWT_SECRET } from "./config.js";
+
 
 
 dotenv.config();
 const app = express();
+const PORT = process.env.PORT || 3000
 app.use(express.json())
 app.use(cors())
 
 
-const PORT = process.env.PORT || 3000
 
 app.post('/api/v1/signup', async (req, res) => {
     const { username, password } = req.body;
@@ -85,7 +86,7 @@ app.post('/api/v1/signin', async (req, res) => {
             id: user._id,
             username: user.username
 
-        }, JWT_SECRET)
+        },JWT_SECRET)
 
         return res.status(200).json({
             msg: "Login successful",
