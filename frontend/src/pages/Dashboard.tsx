@@ -150,9 +150,12 @@ function Dashboard() {
   });
 
   return (
-    <div className="h-screen flex justify-center lg:justify-normal">
+    <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Sidebar */}
-      <Sidebar activeFilter={activeFilter} onFilterChange={(type) => setActiveFilter(type)} />
+      <Sidebar
+        activeFilter={activeFilter}
+        onFilterChange={(type) => setActiveFilter(type)}
+      />
 
       {/* EDIT MODAL */}
       <EditContentModal
@@ -160,16 +163,21 @@ function Dashboard() {
         content={editingContent}
         onClose={() => setEditingContent(null)}
         onUpdated={(updated) => {
-          setContents((prev) => prev.map((c) => (c._id === updated._id ? updated : c)));
+          setContents((prev) =>
+            prev.map((c) => (c._id === updated._id ? updated : c))
+          );
         }}
       />
 
-      <div className="flex-1">
+      <div className="flex-1 w-full">
         {/* ADD CONTENT MODAL */}
-        <CreateContentModel open={modelOpen} onClose={() => setModelOpen(false)} />
+        <CreateContentModel
+          open={modelOpen}
+          onClose={() => setModelOpen(false)}
+        />
 
         {/* TOP BUTTON BAR */}
-        <div className="flex justify-end items-end mt-5 mr-10 h-auto gap-3">
+        <div className="flex flex-wrap justify-end items-center gap-3 mt-4 px-4 sm:px-6 lg:px-10">
           <Button
             onClick={async () => {
               if (!token) return alert("You're not logged in");
@@ -182,7 +190,7 @@ function Dashboard() {
                 const shareUrl = `http://localhost:5173/share/${response.data.hash}`;
                 await navigator.clipboard.writeText(shareUrl);
                 alert("Copied to clipboard!");
-              } catch (error) {
+              } catch {
                 alert("Failed to generate share link");
               }
             }}
@@ -202,7 +210,7 @@ function Dashboard() {
         </div>
 
         {/* TAGS + SEARCH BAR */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mt-4 px-10 gap-3">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mt-4 px-4 sm:px-6 lg:px-10 gap-3">
           {/* Tags */}
           <div className="flex flex-wrap gap-2">
             {allTags.length > 0 && (
@@ -210,7 +218,9 @@ function Dashboard() {
                 <button
                   onClick={() => setActiveTag(null)}
                   className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                    activeTag === null ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-700 border-slate-200"
+                    activeTag === null
+                      ? "bg-slate-900 text-white border-slate-900"
+                      : "bg-white text-slate-700 border-slate-200"
                   }`}
                 >
                   All tags
@@ -221,7 +231,9 @@ function Dashboard() {
                     key={tag}
                     onClick={() => handleTagClick(tag)}
                     className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                      activeTag === tag ? "bg-purple-600 text-white border-purple-600" : "bg-white text-slate-700 border-slate-200"
+                      activeTag === tag
+                        ? "bg-purple-600 text-white border-purple-600"
+                        : "bg-white text-slate-700 border-slate-200"
                     }`}
                   >
                     #{tag}
@@ -232,19 +244,19 @@ function Dashboard() {
           </div>
 
           {/* Search */}
-          <div className="w-full lg:w-64">
+          <div className="w-full sm:w-72">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search title, link, tags..."
-              className="w-full px-3 py-2 text-sm rounded-full border border-slate-200 outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 text-sm rounded-full border border-slate-200 outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
         </div>
 
         {/* CONTENT CARDS */}
-        <div className="flex justify-around items-center flex-col sm:flex-row flex-wrap">
+        <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 mt-6 px-2 sm:px-4 lg:px-6">
           {sortedContents.map((item) => (
             <Card
               key={item._id}

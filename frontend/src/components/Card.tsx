@@ -69,81 +69,109 @@ export const Card = ({
     navigator?.clipboard?.writeText(link).catch(() => { });
   };
 
-  return (
-    <div className="flex flex-col border border-slate-300 h-auto w-80 overflow-hidden rounded-xl mt-5 ml-5 my-5 py-3 px-5 shadow-md bg-white">
+ return (
+  <div className="
+    flex flex-col 
+    border border-slate-300 
+    bg-white 
+    rounded-xl 
+    shadow-md
+    w-full 
+    sm:w-[22rem] 
+    md:w-[24rem]
+    p-4 
+    sm:p-5
+    mx-auto
+    mt-4
+  ">
 
-      {/* Header */}
-      <div className="flex justify-between gap-2">
-        <div className="flex gap-3 min-w-0">
-          {iconMap[type]}
-          <p className="font-semibold truncate" title={title}>{title}</p>
-        </div>
-
-        <div className="flex gap-3 shrink-0 ">
-          <button onClick={onPin}>{isPinned ? "⭐" : "☆"}</button>
-          <button className="cursor-pointer" onClick={handleShare}><ShareIcon size="lg" /></button>
-          <button className="cursor-pointer" onClick={onEdit}><EditIcon size="lg" /></button>
-          <button className="cursor-pointer" onClick={onDelete}><DeleteIcon size="lg" /></button>
-        </div>
+    {/* Header */}
+    <div className="flex flex-col sm:flex-row sm:justify-between gap-3">
+      <div className="flex items-center gap-3 min-w-0">
+        {iconMap[type]}
+        <p className="font-semibold truncate text-sm sm:text-base" title={title}>
+          {title}
+        </p>
       </div>
 
-      {/*  STATUS SECTION HERE */}
-      <div className="flex items-center gap-2 mt-2">
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status]}`}>
-          {status.replace("-", " ")}
-        </span>
-
-        <button
-          className="text-xs px-2 py-1 border rounded-lg hover:bg-slate-100"
-          onClick={() => {
-            const cycle = {
-              "to-learn": "in-progress",
-              "in-progress": "done",
-              "done": "to-learn",
-            };
-            onStatusChange?.(cycle[status]);
-          }}
-        >
-          ⟳
+      <div className="flex gap-3 justify-end flex-wrap sm:flex-nowrap">
+        <button onClick={onPin} className="text-lg">
+          {isPinned ? "⭐" : "☆"}
         </button>
+        <button onClick={handleShare}><ShareIcon size="lg" /></button>
+        <button onClick={onEdit}><EditIcon size="lg" /></button>
+        <button onClick={onDelete}><DeleteIcon size="lg" /></button>
       </div>
+    </div>
 
-      {/* Content */}
-      <div className="w-full h-auto mt-3 mb-2 space-y-2">
-        {type === "youtube" && (
+    {/* Status */}
+    <div className="flex items-center gap-2 mt-3 flex-wrap">
+      <span
+        className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[status]}`}
+      >
+        {status.replace("-", " ")}
+      </span>
+
+      <button
+        className="text-xs px-3 py-1 border rounded-lg hover:bg-slate-100"
+        onClick={() => {
+          const cycle = {
+            "to-learn": "in-progress",
+            "in-progress": "done",
+            "done": "to-learn",
+          };
+          onStatusChange?.(cycle[status]);
+        }}
+      >
+        ⟳
+      </button>
+    </div>
+
+    {/* Content */}
+    <div className="w-full mt-3 space-y-3">
+      {type === "youtube" && (
+        <div className="w-full aspect-video">
           <iframe
-            className="rounded-2xl min-h-72 w-full"
+            className="w-full h-full rounded-xl"
             src={link.replace("watch?v=", "embed/")}
             title="YouTube video player"
             allowFullScreen
           />
-        )}
+        </div>
+      )}
 
-        {type === "twitter" && (
-          <div ref={twitterRef} className="rounded-xl bg-slate-50 border border-slate-200 overflow-hidden">
-            <blockquote className="twitter-tweet m-0 p-2">
-              <a href={normalizedLink}></a>
-            </blockquote>
-          </div>
-        )}
+      {type === "twitter" && (
+        <div
+          ref={twitterRef}
+          className="rounded-xl bg-slate-50 border border-slate-200 overflow-hidden"
+        >
+          <blockquote className="twitter-tweet m-0 p-2">
+            <a href={normalizedLink}></a>
+          </blockquote>
+        </div>
+      )}
 
-        {type === "note" && (
-          <div className="p-3 border border-slate-200 rounded-lg bg-slate-50 text-sm text-gray-700">
-            <p>{detail || link}</p>
-          </div>
-        )}
-      </div>
-
-      {/* Tags */}
-      {tags && tags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-2">
-          {tags.map((t) => (
-            <span key={t} className="bg-slate-100 px-2 py-1 rounded-full text-[11px] font-medium text-slate-700">
-              #{t}
-            </span>
-          ))}
+      {type === "note" && (
+        <div className="p-3 border border-slate-200 rounded-lg bg-slate-50 text-sm text-gray-700">
+          <p className="break-words">{detail || link}</p>
         </div>
       )}
     </div>
-  );
+
+    {/* Tags */}
+    {tags && tags.length > 0 && (
+      <div className="flex flex-wrap gap-2 mt-3">
+        {tags.map((t) => (
+          <span
+            key={t}
+            className="bg-slate-100 px-3 py-1 rounded-full text-[11px] font-medium text-slate-700"
+          >
+            #{t}
+          </span>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
 };

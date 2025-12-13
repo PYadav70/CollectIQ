@@ -31,16 +31,26 @@ export const Button = (props: ButtonProps) => {
   return (
     <button
       onClick={props.onClick}
-      className={`${varientsStyle[props.variant]} ${defaultStyle} ${sizeStyle[props.size ?? 'md']} flex justify-center ${props.loading ? "opacity-50 cursor-not-allowed" : ""} hover:bg-blue-600 transition-all hover:duration-300 hover:scale-105`}
+      className={`
+        ${varientsStyle[props.variant]}
+        ${defaultStyle}
+        ${sizeStyle[props.size ?? "md"]}
+        flex justify-center items-center
+        ${props.fullWidth ? "w-full" : "w-auto"}
+        text-sm sm:text-base
+        ${props.loading ? "opacity-50 cursor-not-allowed" : ""}
+        hover:bg-blue-600 transition-all duration-300 hover:scale-105
+      `}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap justify-center">
         {props.startIcon}
-        {props.text}
+        <span className="whitespace-nowrap">{props.text}</span>
         {props.endIcon}
       </div>
     </button>
   );
 };
+
 
 {
   <Button variant="primary" size="md" onClick={() => { }} text={"asd"} />;

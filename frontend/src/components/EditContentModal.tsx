@@ -1,6 +1,6 @@
 // src/components/EditContentModal.tsx
-import  { useEffect, useRef, useState } from "react";
-import type {FormEvent } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { FormEvent } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "../config";
 import { CrossIcon } from "../icons/CrossIcon";
@@ -23,17 +23,16 @@ export const EditContentModal = ({
   content,
   onUpdated,
 }: EditContentModalProps) => {
-  const titleRef = useRef<HTMLInputElement>(null)!;
-  const linkRef = useRef<HTMLInputElement>(null)!;
-  const typeRef = useRef<HTMLSelectElement>(null)!;
-  const detailsRef = useRef<HTMLInputElement>(null)!;
+  const titleRef = useRef<HTMLInputElement>(null);
+  const linkRef = useRef<HTMLInputElement>(null);
+  const typeRef = useRef<HTMLSelectElement>(null);
+  const detailsRef = useRef<HTMLInputElement>(null);
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   useEffect(() => {
     if (!open || !content) return;
 
-    // pre-fill refs
     if (titleRef.current) titleRef.current.value = content.title || "";
     if (linkRef.current) linkRef.current.value = content.link || "";
     if (detailsRef.current) detailsRef.current.value = content.details || "";
@@ -84,14 +83,17 @@ export const EditContentModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-3 sm:px-0 overflow-y-auto">
       {/* backdrop */}
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      <div className="relative z-50 w-[90%] max-w-md bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
+      <div
+        className="relative z-50 w-full max-w-md bg-white rounded-3xl shadow-2xl
+        p-5 sm:p-8 my-6 sm:my-0 max-h-[90vh] overflow-y-auto"
+      >
         <button
           className="absolute right-4 top-4 text-slate-500 hover:text-slate-900"
           onClick={onClose}
@@ -99,17 +101,20 @@ export const EditContentModal = ({
           <CrossIcon size="lg" />
         </button>
 
-        <h2 className="text-xl font-semibold text-slate-800 mb-6">
+        <h2 className="text-lg sm:text-xl font-semibold text-slate-800 mb-5 sm:mb-6">
           Edit content
         </h2>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
-          <Input inputRef={titleRef} type="text" placeholder="Title*" />
-          <Input inputRef={linkRef} type="url" placeholder="Link*" />
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-3 sm:gap-4 w-full"
+        >
+          <Input inputRef={titleRef} type="text" placeholder="Title" />
+          <Input inputRef={linkRef} type="url" placeholder="Link" />
 
           <select
             ref={typeRef}
-            className="w-full px-6 py-3 border rounded-lg outline-none cursor-pointer bg-white"
+            className="w-full px-4 sm:px-6 py-3 border rounded-lg outline-none cursor-pointer bg-white"
             defaultValue={content.type}
           >
             <option value="youtube">YouTube</option>
@@ -118,7 +123,7 @@ export const EditContentModal = ({
             <option value="note">Note</option>
             <option value="notion">Notion</option>
           </select>
-         
+
           <Input
             inputRef={detailsRef}
             type="text"
@@ -130,7 +135,7 @@ export const EditContentModal = ({
             <p className="text-xs font-semibold text-slate-600 mb-2">
               Tags (optional)
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
               {TAG_OPTIONS.map((tag) => {
                 const active = selectedTags.includes(tag);
                 return (
@@ -151,7 +156,7 @@ export const EditContentModal = ({
             </div>
           </div>
 
-          <div className="mt-4 flex justify-center">
+          <div className="mt-4 sm:mt-5 flex justify-center">
             <Button onClick={handleSubmit} variant="primary" text="Save" />
           </div>
         </form>

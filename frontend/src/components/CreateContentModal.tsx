@@ -72,7 +72,8 @@ export const CreateContentModel = ({ open, onClose }: CreateContentModelProps) =
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-3 sm:px-0 overflow-y-auto">
+
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300"
@@ -81,9 +82,12 @@ export const CreateContentModel = ({ open, onClose }: CreateContentModelProps) =
 
       {/* Modal */}
       <div
-        className="relative z-50 w-[90%] max-w-md bg-white rounded-3xl shadow-2xl p-6 sm:p-8 
+        className="relative z-50 w-full max-w-md bg-white rounded-3xl shadow-2xl 
+        p-5 sm:p-8 my-6 sm:my-0 
+        max-h-[90vh] overflow-y-auto
         animate-[fadeIn_0.25s_ease]"
       >
+
         {/* Close Button */}
         <button
           className="absolute right-4 top-4 text-slate-500 hover:text-slate-900 
@@ -94,36 +98,38 @@ export const CreateContentModel = ({ open, onClose }: CreateContentModelProps) =
         </button>
 
         {/* Title */}
-        <h2 className="text-xl font-semibold text-slate-800 mb-6">
+        <h2 className="text-lg sm:text-xl font-semibold text-slate-800 mb-5 sm:mb-6">
           Add new content
         </h2>
 
         {/* Form */}
-       <form onSubmit={addContent} className="flex flex-col gap-4 w-full">
-      <Input inputRef={titleRef} type="text" placeholder="Title" />
-      <Input inputRef={linkRef} type="url" placeholder="Link" />
+        <form onSubmit={addContent} className="flex flex-col gap-3 sm:gap-4 w-full">
+          <Input inputRef={titleRef} type="text" placeholder="Title" />
+          <Input inputRef={linkRef} type="url" placeholder="Link" />
 
-  {/* Dropdown instead of text input */}
-  <select
-    ref={typeRef}
-    className="w-full px-6 py-3 border rounded-lg outline-none cursor-pointer bg-white"
-    defaultValue="youtube"
-  >
-    <option value="youtube">YouTube</option>
-    <option value="twitter">Twitter</option>
-    <option value="links">Links</option>
-    <option value="note">Note</option>
-    <option value="notion">Notion</option>
-  </select>
+          {/* Dropdown instead of text input */}
+          <select
+            ref={typeRef}
+            className="w-full px-4 sm:px-6 py-3 border rounded-lg outline-none cursor-pointer bg-white"
+            defaultValue='youtube'
+          >
 
-  <Input inputRef={detailsRef} type="text" placeholder="Details" />
+            <option value="youtube">YouTube</option>
+            <option value="twitter">Twitter</option>
+            <option value="links">Links</option>
+            <option value="note">Note</option>
+            <option value="notion">Notion</option>
+          </select>
+
+          <Input inputRef={detailsRef} type="text" placeholder="Details" />
 
           {/* TAGS SECTION */}
           <div className="mt-2">
             <p className="text-xs font-semibold text-slate-600 mb-2">
               Tags (optional)
             </p>
-            <div className="flex flex-wrap gap-2">
+           <div className="flex flex-wrap gap-2 sm:gap-3">
+
               {TAG_OPTIONS.map((tag) => {
                 const active = selectedTags.includes(tag);
                 return (
@@ -131,11 +137,10 @@ export const CreateContentModel = ({ open, onClose }: CreateContentModelProps) =
                     key={tag}
                     type="button"
                     onClick={() => toggleTag(tag)}
-                    className={`px-3 py-1 rounded-full border text-xs font-medium transition-colors ${
-                      active
-                        ? "bg-purple-600 border-purple-600 text-white"
-                        : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
-                    }`}
+                    className={`px-3 py-1 rounded-full border text-xs font-medium transition-colors ${active
+                      ? "bg-purple-600 border-purple-600 text-white"
+                      : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                      }`}
                   >
                     #{tag}
                   </button>
@@ -144,7 +149,7 @@ export const CreateContentModel = ({ open, onClose }: CreateContentModelProps) =
             </div>
           </div>
 
-          <div className="mt-4">
+           <div className="mt-4 sm:mt-5">
             <Button onClick={addContent} variant="primary" text="Submit" />
           </div>
         </form>
