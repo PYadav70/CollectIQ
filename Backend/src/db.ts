@@ -1,9 +1,16 @@
 import mongoose, { model, Schema } from "mongoose";
 
-mongoose
-  .connect("mongodb://localhost:27017/collectIQ")
-  .then(() => console.log("db connected"))
-  .catch((err) => console.error("db connection error:", err));
+
+
+export const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI as string);
+    console.log("✅ MongoDB Connected");
+  } catch (error) {
+    console.error("MongoDB Connection Failed", error);
+    process.exit(1);
+  }
+};
 
 //  User schema 
 const userSchema = new Schema({

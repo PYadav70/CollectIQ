@@ -1,16 +1,21 @@
+import dotenv from "dotenv";
+dotenv.config(); 
 import express from "express";
 import jwt from "jsonwebtoken";
 import { random } from "./utils.js";
 import bcrypt from "bcrypt"
 import { contentModel, linkModel, userModel } from "./db.js";
-import dotenv from 'dotenv';
 import { userMiddleware } from "./middleware.js";
 import cors from 'cors'
 import { JWT_SECRET } from "./config.js";
+import { connectDB } from "./db.js";
 
 
 
-dotenv.config();
+
+
+
+connectDB();
 const app = express();
 const PORT = process.env.PORT || 3000
 app.use(express.json())
