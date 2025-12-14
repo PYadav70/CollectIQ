@@ -1,6 +1,7 @@
 # 🧠 CollectIQ
 
-CollectIQ is a that helps you **capture, organize, and revisit knowledge** from across the internet — tweets, videos, links, notes, and more — all in one place.
+CollectIQ is a Second Brain web application that helps users save, organize, and manage useful content (tweets, videos, notes, links, etc.) in one place.
+It is built with a MERN-style stack and focuses on productivity, learning, and knowledge management.
 
 Built for learners, developers, and productivity enthusiasts.
 
@@ -12,7 +13,8 @@ Built for learners, developers, and productivity enthusiasts.
 - **Backend:** Node.js, Express, TypeScript
 - **Database:** MongoDB (Mongoose ODM)
 - **Authentication:** JWT (JSON Web Tokens)
-- **Deployment:** Vercel (Frontend & Backend)
+- **Deployment:** Vercel (Frontend)
+- **Deployment:** render (Backend)
 
 ---
 
@@ -145,8 +147,6 @@ Make sure environment variables are added in Vercel Dashboard.
 ✅ Pin cards
 
 🔄 Public / Friends visibility
-
-🌙 Dark mode
 
 📂 Collections
 
