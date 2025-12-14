@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import axios from "axios";
-import { BACKEND_URL } from "../config";
 import { CrossIcon } from "../icons/CrossIcon";
 import { Button } from "./Button";
 import { Input } from "./Input";
@@ -59,7 +58,7 @@ export const EditContentModal = ({
 
     try {
       const res = await axios.put(
-        `${BACKEND_URL}/api/v1/content/${content._id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/content/${content._id}`,
         {
           title: titleRef.current?.value,
           link: linkRef.current?.value,

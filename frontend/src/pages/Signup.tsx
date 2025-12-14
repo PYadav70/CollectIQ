@@ -3,7 +3,6 @@ import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { CrossIcon } from "../icons/CrossIcon";
 import axios from "axios";
-import { BACKEND_URL } from "../config";
 import { useNavigate } from "react-router-dom";
 
 
@@ -24,7 +23,7 @@ export const Signup = () => {
         }
 
         try {
-            const response = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/signup`, {
                 username,
                 password,
             });

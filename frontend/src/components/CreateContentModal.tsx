@@ -3,7 +3,7 @@ import { CrossIcon } from "../icons/CrossIcon";
 import { Button } from "./Button";
 import { Input } from "./Input";
 import axios from "axios";
-import { BACKEND_URL } from "../config";
+
 
 interface CreateContentModelProps {
   open: boolean;
@@ -46,7 +46,7 @@ export const CreateContentModel = ({ open, onClose }: CreateContentModelProps) =
 
     try {
       await axios.post(
-        `${BACKEND_URL}/api/v1/content`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/content`,
         {
           title,
           link,

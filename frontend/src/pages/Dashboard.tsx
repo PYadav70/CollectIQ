@@ -12,7 +12,7 @@ import { EditContentModal } from "../components/EditContentModal";
 import type { Content } from "../hooks/UseContent";
 import { useContent } from "../hooks/UseContent";
 import axios from "axios";
-import { BACKEND_URL } from "../config";
+
 
 type RowContent = Content & {
   isPinned?: boolean;
@@ -37,7 +37,7 @@ function Dashboard() {
     }
 
     try {
-      await axios.delete(`${BACKEND_URL}/api/v1/content/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/v1/content/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -64,7 +64,7 @@ function Dashboard() {
 
     try {
       const res = await axios.patch(
-        `${BACKEND_URL}/api/v1/content/${id}/pin`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/content/${id}/pin`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -101,7 +101,7 @@ function Dashboard() {
 
     try {
       await axios.patch(
-        `${BACKEND_URL}/api/v1/content/${id}/status`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/content/${id}/status`,
         { status: newStatus },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -183,7 +183,7 @@ function Dashboard() {
               if (!token) return alert("You're not logged in");
               try {
                 const response = await axios.post(
-                  `${BACKEND_URL}/api/v1/brain/share`,
+                  `${import.meta.env.VITE_BACKEND_URL}/api/v1/brain/share`,
                   { share: true },
                   { headers: { Authorization: `Bearer ${token}` } }
                 );
