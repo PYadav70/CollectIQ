@@ -340,6 +340,10 @@ app.get('/api/v1/brain/:shareLink', async (req, res) => {
         content
     })
 })
+app.get("/", (req, res) => {
+  res.status(200).send("CollectIQ Backend is running 🚀");
+});
+
 
 app.listen(PORT, () => {
     console.log(`surver is running at: ${PORT}`)
