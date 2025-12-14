@@ -1,6 +1,6 @@
-# 🧠 CollectIQ — Your Second Brain
+# 🧠 CollectIQ
 
-CollectIQ is a **Second Brain web application** that helps you **capture, organize, and revisit knowledge** from across the internet — tweets, videos, links, notes, and more — all in one place.
+CollectIQ is a that helps you **capture, organize, and revisit knowledge** from across the internet — tweets, videos, links, notes, and more — all in one place.
 
 Built for learners, developers, and productivity enthusiasts.
 
