@@ -153,7 +153,7 @@ export const Card = ({
 
       {type === "note" && (
         <div className="p-3 border border-slate-200 rounded-lg bg-slate-50 text-sm text-gray-700">
-          <p className="break-words">{detail || link}</p>
+          <p className="word-break">{detail || link}</p>
         </div>
       )}
     </div>
