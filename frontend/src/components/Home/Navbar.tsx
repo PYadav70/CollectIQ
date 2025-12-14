@@ -1,31 +1,34 @@
-import { BrainIcon } from "../../icons/BrainIcon"
-import { Button } from "../Button"
-import { useNavigate } from "react-router-dom"
-
+import { BrainIcon } from "../../icons/BrainIcon";
+import { Button } from "../Button";
+import { useNavigate } from "react-router-dom";
 
 export const Navbar = () => {
-    const navigate = useNavigate()
+  const navigate = useNavigate();
 
-    return <div className="p-8">
-        <div className="flex justify-between items-center">
-            <div
-                className="flex items-center justify-center ml-10 mb-10">
-                <BrainIcon size="xl" />
-                <h1 onClick={() => {
-                    navigate('/')
-                }} className="text-4xl font-semibold ml-3 cursor-pointer">CollectIQ</h1>
-            </div>
-            <div className='flex justify-end items-end mt-[-25px] mr-10 h-fit w-fit ml-4'>
-                <Button
-                    variant="primary"
-                    size="lg"
-                    text="Signup"
-                    onClick={() => {
-                        navigate('/signup')
-                    }}
-                />
-            </div>
-
+  return (
+    <nav className="w-full px-4 sm:px-6 lg:px-10 py-4">
+      <div className="flex items-center justify-between">
+        {/* Logo */}
+        <div
+          onClick={() => navigate("/")}
+          className="flex items-center gap-2 sm:gap-3 cursor-pointer"
+        >
+          <BrainIcon size="lg" />
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold">
+            CollectIQ
+          </h1>
         </div>
-    </div>
-}
+
+        {/* CTA Button */}
+        <div>
+          <Button
+            variant="primary"
+            size="md"
+            text="Signup"
+            onClick={() => navigate("/signup")}
+          />
+        </div>
+      </div>
+    </nav>
+  );
+};
