@@ -7,17 +7,15 @@ Built for learners, developers, and productivity enthusiasts.
 
 ---
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Frontend-React%20%7C%20TypeScript%20%7C%20Tailwind-blue" />
-  <img src="https://img.shields.io/badge/Backend-Node.js%20%7C%20Express%20%7C%20TypeScript-green" />
-  <img src="https://img.shields.io/badge/Database-MongoDB-brightgreen" />
-  <img src="https://img.shields.io/badge/Auth-JWT-orange" />
-</p>
+## ⚙️ Tech Stack
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Status-Active%20Development-purple" />
-  <img src="https://img.shields.io/badge/License-MIT-black" />
-</p>
+- **Frontend:** React, TypeScript, Tailwind CSS
+- **Backend:** Node.js, Express, TypeScript
+- **Database:** MongoDB (Mongoose ODM)
+- **Authentication:** JWT (JSON Web Tokens)
+- **Deployment:** Vercel (Frontend & Backend)
+
+---
 
 
 ## 📂 Folder Structure
