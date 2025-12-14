@@ -1,6 +1,6 @@
 interface InputProps {
   placeholder: string;
-  inputRef?: React.RefObject<HTMLInputElement>;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
   type: string;
 }
 
@@ -8,6 +8,9 @@ export function Input({ placeholder, inputRef, type }: InputProps) {
   return (
     <div className="w-full">
       <input
+        ref={inputRef}
+        type={type}
+        placeholder={placeholder}
         className="
           w-full
           px-4 sm:px-6
@@ -17,9 +20,6 @@ export function Input({ placeholder, inputRef, type }: InputProps) {
           outline-none
           text-sm sm:text-base
         "
-        placeholder={placeholder}
-        ref={inputRef}
-        type={type}
       />
     </div>
   );
