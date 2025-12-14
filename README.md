@@ -1,7 +1,6 @@
 # 🧠 CollectIQ
 
-CollectIQ is a Second Brain web application that helps users save, organize, and manage useful content (tweets, videos, notes, links, etc.) in one place.
-It is built with a MERN-style stack and focuses on productivity, learning, and knowledge management.
+CollectIQ is a web application that helps users save, organize, and manage useful content (tweets, videos, notes, links, etc.) in one place.
 
 Built for learners, developers, and productivity enthusiasts.
 
