@@ -18,8 +18,16 @@ import { connectDB } from "./db.js";
 connectDB();
 const app = express();
 const PORT = process.env.PORT || 3000
+app.use(
+  cors({
+    origin: "https://collect-iq-746.vercel.app",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true,
+  })
+);
+
 app.use(express.json())
-app.use(cors())
+
 
 
 
