@@ -20,11 +20,11 @@ const app = express();
 const PORT = process.env.PORT || 3000
 app.use(
   cors({
-    origin: "https://collect-iq-746.vercel.app",
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    origin: true, // allow all origins
     credentials: true,
   })
 );
+
 
 app.use(express.json())
 
