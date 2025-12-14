@@ -1,157 +1,114 @@
-🧠 CollectIQ – Second Brain Application
+# 🧠 CollectIQ — Your Second Brain
 
-CollectIQ is a Second Brain web application that helps users save, organize, and manage useful content (tweets, videos, notes, links, etc.) in one place.
-It is built with a MERN-style stack and focuses on productivity, learning, and knowledge management.
+CollectIQ is a **Second Brain web application** that helps you **capture, organize, and revisit knowledge** from across the internet — tweets, videos, links, notes, and more — all in one place.
 
-🚀 Features
-✅ Core Features
+Built for learners, developers, and productivity enthusiasts.
 
-🔐 User authentication (Signup / Signin using JWT)
+---
 
-📌 Save content from:
+## ⚙️ Tech Stack
 
-Twitter (X)
+- **Frontend:** React, TypeScript, Tailwind CSS
+- **Backend:** Node.js, Express, TypeScript
+- **Database:** MongoDB (Mongoose ODM)
+- **Authentication:** JWT (JSON Web Tokens)
+- **Deployment:** Vercel (Frontend & Backend)
 
-YouTube
+---
 
-Notes
+## 📂 Folder Structure
 
-Links
-
-Notion
-
-🏷️ Tag-based organization
-
-🔍 Search by title, link, tags, and details
-
-🗑️ Edit & delete saved content
-
-🔄 Content status tracking:
-
-To Learn
-
-In Progress
-
-Done
-
-⭐ Advanced Features
-
-📍 Pinned cards (keep important content at the top)
-
-🔗 Share your “brain” using a public share link
-
-👥 Visibility control (planned):
-
-Only me
-
-Friends
-
-Public
-
-🌙 Dark mode (planned)
-
-📂 Collections / folders (planned)
-
-🤖 AI-powered summaries (planned)
-
-🛠️ Tech Stack
-Frontend
-
-React (Vite)
-
-TypeScript
-
-Tailwind CSS
-
-Axios
-
-React Router
-
-Backend
-
-Node.js
-
-Express.js
-
-TypeScript
-
-MongoDB + Mongoose
-
-JWT Authentication
-
-bcrypt (password hashing)
-
-Database
-
-MongoDB (Local / Atlas)
-
-📂 Project Structure
-second-brain/
-│
-├── backend/
-│   ├── src/
-│   │   ├── config.ts
-│   │   ├── db.ts
-│   │   ├── middleware.ts
-│   │   ├── index.ts
-│   │   └── utils.ts
-│   ├── .env
-│   └── package.json
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── hooks/
-│   │   └── App.tsx
-│   ├── .env
-│   └── package.json
-│
+```bash
+collectiq/
+├── frontend/        # React + Tailwind frontend
+├── backend/         # Node + Express backend
 └── README.md
+✨ Features
+🔐 Authentication
+Signup & Signin using JWT
 
-🔐 Environment Variables
-Backend (backend/.env)
-PORT=3000
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net
-JWT_SECRET=your_jwt_secret
+Secure password hashing with bcrypt
 
-Frontend (frontend/.env)
-VITE_BACKEND_URL=http://localhost:3000
+📚 Content Management
+Save Tweets, YouTube videos, Links, Notes
 
-▶️ Running Locally
-1️⃣ Clone the repository
+Add titles, details, and tags
+
+Edit & delete content
+
+🏷️ Organization
+Tag-based filtering
+
+Search by title, link, details, and tags
+
+Status tracking:
+
+🟣 To Learn
+
+🟡 In Progress
+
+🟢 Done
+
+⭐ Advanced
+Pin important cards
+
+Share your brain via public link
+
+Private / Public visibility (in progress)
+
+Dark mode (planned)
+
+Collections / folders (planned)
+
+AI summaries (planned)
+
+🚀 Getting Started
+1️⃣ Clone the Repository
+bash
+Copy code
 git clone https://github.com/your-username/collectiq.git
 cd collectiq
-
-2️⃣ Start Backend
+2️⃣ Setup Backend
+bash
+Copy code
 cd backend
 npm install
 npm run dev
+Create a .env file inside backend/:
 
+env
+Copy code
+PORT=3000
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net
+JWT_SECRET=your_secret_key
+Backend will run on:
 
-Backend runs at:
-
+arduino
+Copy code
 http://localhost:3000
-
-3️⃣ Start Frontend
+3️⃣ Setup Frontend
+bash
+Copy code
 cd frontend
 npm install
 npm run dev
+Create a .env file inside frontend/:
 
+env
+Copy code
+VITE_BACKEND_URL=http://localhost:3000
+Frontend will run on:
 
-Frontend runs at:
-
+arduino
+Copy code
 http://localhost:5173
-
-📡 API Endpoints (Backend)
+🔌 API Endpoints
 Auth
-
 POST /api/v1/signup
 
 POST /api/v1/signin
 
 Content
-
 POST /api/v1/content
 
 GET /api/v1/content
@@ -165,37 +122,41 @@ PATCH /api/v1/content/:id/status
 PATCH /api/v1/content/:id/pin
 
 Share
-
 POST /api/v1/brain/share
 
 GET /api/v1/brain/:shareLink
 
-🌍 Deployment 
-
+🌍 Deployment
 Frontend: Vercel
 
-Backend: Vercel / Render
+Backend: Vercel (Serverless)
 
 Database: MongoDB Atlas
 
-🎯 Future Improvements
+Make sure environment variables are added in Vercel Dashboard.
 
-Dark mode toggle
+🧭 Roadmap
+✅ Auth system
 
-Friend-based visibility system
+✅ Search & tag filtering
 
-Folder / collection system
+✅ Edit content
 
-AI summaries using LLMs
+✅ Pin cards
 
-Mobile responsive UI polish
+🔄 Public / Friends visibility
+
+🌙 Dark mode
+
+📂 Collections
+
+🤖 AI-powered summaries
 
 👨‍💻 Author
-
 Pappu Kumar Yadav
 B.Tech Student | Full Stack Developer
-📌 MERN | TypeScript | MongoDB | React
+MERN • TypeScript • MongoDB • React
 
 ⭐ Support
-
-If you like this project, don’t forget to star ⭐ the repository!
+If you like this project, please star ⭐ the repository
+It really helps!
