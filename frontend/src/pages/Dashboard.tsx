@@ -12,6 +12,8 @@ import { EditContentModal } from "../components/EditContentModal";
 import type { Content } from "../hooks/UseContent";
 import { useContent } from "../hooks/UseContent";
 import axios from "axios";
+import { ProfileAvatar } from "../components/ProfileAvatar";
+
 
 
 type RowContent = Content & {
@@ -28,6 +30,15 @@ function Dashboard() {
 
   const { contents, setContents } = useContent();
   const token = localStorage.getItem("token");
+  const username = localStorage.getItem("username") || "User";
+  const avatar = localStorage.getItem("avatar") || "";
+
+const handleLogout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("username");
+  window.location.href = "/signin";
+};
+
 
   // DELETE CONTENT
   const handleDelete = async (id: string) => {
@@ -178,6 +189,11 @@ function Dashboard() {
 
         {/* TOP BUTTON BAR */}
         <div className="flex flex-wrap justify-end items-center gap-3 mt-4 px-4 sm:px-6 lg:px-10">
+          <ProfileAvatar
+          username={username}
+          imageUrl={avatar}
+          onLogout={handleLogout}
+          />
           <Button
             onClick={async () => {
               if (!token) return alert("You're not logged in");
@@ -263,7 +279,7 @@ function Dashboard() {
               title={item.title || ""}
               link={item.link}
               type={item.type}
-              detail={item.details}
+              details={item.details}
               tags={item.tags}
               status={item.status || "to-learn"}
               isPinned={(item as RowContent).isPinned || false}

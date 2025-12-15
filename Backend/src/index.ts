@@ -7,10 +7,10 @@ import bcrypt from "bcrypt"
 import { contentModel, linkModel, userModel } from "./db.js";
 import { userMiddleware } from "./middleware.js";
 import cors from 'cors'
-import { JWT_SECRET } from "./config.js";
 import { connectDB } from "./db.js";
-
-
+import { upload } from "./multer.js";
+import cloudinary from "./cloudinary.js"
+import { JWT_SECRET } from "./config.js";
 
 
 
@@ -68,52 +68,89 @@ app.post('/api/v1/signup', async (req, res) => {
 })
 
 
-app.post('/api/v1/signin', async (req, res) => {
-    try {
-        const username = req.body.username
-        const password = req.body.password
+app.post("/api/v1/signin", async (req, res) => {
+  try {
+    const { username, password } = req.body;
 
-        if (!username || !password) {
-            return res.status(401).json({
-                msg: "username and password required"
-            })
-        }
-        const user = await userModel.findOne({
-            username
-        })
-        if (!user) {
-            return res.status(404).json({
-                msg: "User not found"
-            })
-        }
-
-        const isPasswordCorrect = await bcrypt.compare(password, user.password)
-
-        if (!isPasswordCorrect) {
-            return res.status(401).json({
-                msg: "Invalid password"
-            })
-        }
-
-        const token = jwt.sign({
-            id: user._id,
-            username: user.username
-
-        },JWT_SECRET)
-
-        return res.status(200).json({
-            msg: "Login successful",
-            token,
-        });
-    } catch (error) {
-        console.log("Signin error");
-
-        return res.status(411).json({
-            msg: "Something went wrong",
-            error: error
-        })
+    if (!username || !password) {
+      return res.status(400).json({
+        msg: "Username and password required",
+      });
     }
-})
+
+    const user = await userModel.findOne({ username });
+
+    if (!user) {
+      return res.status(404).json({
+        msg: "User not found",
+      });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordCorrect) {
+      return res.status(401).json({
+        msg: "Invalid password",
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        id: user._id,
+        username: user.username,
+      },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    return res.status(200).json({
+      msg: "Login successful",
+      token,
+      username: user.username,
+    });
+  } catch (error) {
+    console.error("Signin error:", error);
+    return res.status(500).json({
+      msg: "Signin failed",
+    });
+  }
+});
+
+
+// upload profile image on cloudinary
+app.post(
+  "/api/v1/profile/upload",
+  userMiddleware,
+  upload.single("image"), // 👈 MUST be "image"
+  async (req: any, res) => {
+    if (!req.file) {
+      return res.status(400).json({ msg: "No file uploaded" });
+    }
+
+    const base64 = req.file.buffer.toString("base64");
+    const dataUri = `data:${req.file.mimetype};base64,${base64}`;
+
+    const result = await cloudinary.uploader.upload(dataUri, {
+      folder: "collectiq_profiles",
+    });
+
+    const user = await userModel.findByIdAndUpdate(
+      req.userId,
+      { profileImage: result.secure_url },
+      { new: true }
+    );
+
+    res.json({
+      msg: "Profile image updated",
+      avatar: user?.profileImage,
+    });
+  }
+);
+
+
+
+
+
 
 app.post('/api/v1/content', userMiddleware, async (req, res) => {
     try {

@@ -24,6 +24,11 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  profileImage: {
+  type: String,
+  default: ""
+}
+
 });
 
 export const userModel = model("User", userSchema);
