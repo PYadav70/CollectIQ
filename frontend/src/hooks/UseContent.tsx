@@ -10,7 +10,10 @@ export interface Content {
   type: "twitter" | "youtube" | "note" | "links" | "notion";
   details?: string;
   tags?: string[];
-   status: "to-learn" | "in-progress" | "done";  //status update
+  status: "to-learn" | "in-progress" | "done";  //status update
+   visibility: "public" | "friends" | "private";
+
+   
 }
 
 export function useContent() {

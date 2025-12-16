@@ -282,6 +282,7 @@ const handleLogout = () => {
               details={item.details}
               tags={item.tags}
               status={item.status || "to-learn"}
+              visibility={item.visibility}
               isPinned={(item as RowContent).isPinned || false}
               onPin={() => togglePin(item._id)}
               //@ts-ignore

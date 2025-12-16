@@ -51,10 +51,10 @@ const contentSchema = new Schema(
       type: [String],
       default: [],
     },
-
+    
     type: {
       type: String,
-      required: true, // "youtube" | "twitter" | "note" | "links" | "notion"
+      required: true,
     },
 
     // single user, not array
@@ -62,6 +62,12 @@ const contentSchema = new Schema(
       type: mongoose.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+    // privacy features
+    visibility:{
+      type:String,
+      enum:["public", "friends","private"],
+      default:"public",
     },
   },
   { timestamps: true }

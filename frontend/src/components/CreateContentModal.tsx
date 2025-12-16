@@ -20,6 +20,7 @@ export const CreateContentModel = ({ open, onClose }: CreateContentModelProps) =
   const detailsRef = useRef<HTMLInputElement>(null!);
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [visibility, setVisibility] = useState<"public" | "friends" | "private">("public");
 
   if (!open) return null;
 
@@ -53,6 +54,7 @@ export const CreateContentModel = ({ open, onClose }: CreateContentModelProps) =
           type,
           details,
           tags: selectedTags, //  send tags to backend
+          visibility
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -121,6 +123,17 @@ export const CreateContentModel = ({ open, onClose }: CreateContentModelProps) =
             <option value="notion">Notion</option>
           </select>
 
+          <select
+            value={visibility}
+            onChange={(e) => setVisibility(e.target.value as any)}
+            className="border rounded px-3 py-2 text-sm"
+          >
+            <option value="public">🌍 Public</option>
+            <option value="friends">👥 Friends</option>
+            <option value="private">🔒 Only Me</option>
+          </select>
+
+
           <Input inputRef={detailsRef} type="text" placeholder="Details" />
 
           {/* TAGS SECTION */}
@@ -128,7 +141,7 @@ export const CreateContentModel = ({ open, onClose }: CreateContentModelProps) =
             <p className="text-xs font-semibold text-slate-600 mb-2">
               Tags (optional)
             </p>
-           <div className="flex flex-wrap gap-2 sm:gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
 
               {TAG_OPTIONS.map((tag) => {
                 const active = selectedTags.includes(tag);
@@ -149,7 +162,7 @@ export const CreateContentModel = ({ open, onClose }: CreateContentModelProps) =
             </div>
           </div>
 
-           <div className="mt-4 sm:mt-5">
+          <div className="mt-4 sm:mt-5">
             <Button onClick={addContent} variant="primary" text="Submit" />
           </div>
         </form>

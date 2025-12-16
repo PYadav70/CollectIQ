@@ -28,6 +28,10 @@ export const EditContentModal = ({
   const detailsRef = useRef<HTMLInputElement>(null);
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [visibility, setVisibility] = useState<
+    "public" | "friends" | "private"
+  >("public");
+
 
   useEffect(() => {
     if (!open || !content) return;
@@ -37,7 +41,9 @@ export const EditContentModal = ({
     if (detailsRef.current) detailsRef.current.value = content.details || "";
     if (typeRef.current) typeRef.current.value = content.type;
 
+
     setSelectedTags(content.tags || []);
+    setVisibility(content.visibility || "public");
   }, [open, content]);
 
   if (!open || !content) return null;
@@ -65,6 +71,7 @@ export const EditContentModal = ({
           type: typeRef.current?.value,
           details: detailsRef.current?.value,
           tags: selectedTags,
+          visibility
         },
         {
           headers: {
@@ -123,6 +130,19 @@ export const EditContentModal = ({
             <option value="notion">Notion</option>
           </select>
 
+          <select
+            value={visibility}
+            onChange={(e) =>
+              setVisibility(e.target.value as "public" | "friends" | "private")
+            }
+            className="w-full px-4 sm:px-6 py-3 border rounded-lg outline-none cursor-pointer bg-white"
+          >
+            <option value="public">🌍 Public</option>
+            <option value="friends">👥 Friends</option>
+            <option value="private">🔒 Only Me</option>
+          </select>
+
+
           <Input
             inputRef={detailsRef}
             type="text"
@@ -142,11 +162,10 @@ export const EditContentModal = ({
                     key={tag}
                     type="button"
                     onClick={() => toggleTag(tag)}
-                    className={`px-3 py-1 rounded-full border text-xs font-medium transition-colors ${
-                      active
+                    className={`px-3 py-1 rounded-full border text-xs font-medium transition-colors ${active
                         ? "bg-purple-600 border-purple-600 text-white"
                         : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
-                    }`}
+                      }`}
                   >
                     #{tag}
                   </button>

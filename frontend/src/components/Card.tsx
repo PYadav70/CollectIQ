@@ -24,10 +24,11 @@ interface CardProps {
   onShare?: (link: string) => void;
   onEdit?: () => void;
   status: "to-learn" | "in-progress" | "done";
+  visibility?: "public" | "friends" | "private";
   onStatusChange?: (newStatus: string) => void;
   isPinned: boolean;
   onPin?: () => void;
-   onTagClick?: (tag: string) => void;
+  onTagClick?: (tag: string) => void;
 }
 
 export const Card = ({
@@ -40,10 +41,12 @@ export const Card = ({
   onShare,
   onEdit,
   status,
+   visibility,
   onStatusChange,
   onPin,
   isPinned,
   onTagClick
+ 
 }: CardProps) => {
 
   /** ✅ NORMALIZE TYPE (IMPORTANT FIX) */
@@ -70,7 +73,7 @@ export const Card = ({
 
   const handleShare = () => {
     if (onShare) return onShare(link);
-    navigator.clipboard.writeText(link).catch(() => {});
+    navigator.clipboard.writeText(link).catch(() => { });
   };
 
   /** ✅ SAFE YOUTUBE EMBED */
@@ -104,6 +107,18 @@ export const Card = ({
           <button onClick={onDelete}><DeleteIcon size="lg" /></button>
         </div>
       </div>
+
+      {/* Visibility Badge */}
+      {visibility && (
+        <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+          {visibility === "public" && "🌍 Public"}
+          {visibility === "friends" && "👥 Friends"}
+          {visibility === "private" && "🔒 Only Me"}
+        </span>
+      )}
+
+
+
 
       {/* STATUS */}
       <div className="flex items-center gap-2 mt-3">
@@ -159,19 +174,19 @@ export const Card = ({
 
       {/* TAGS */}
       {tags && tags.length > 0 && (
-  <div className="flex flex-wrap gap-2 mt-3">
-    {tags.map((t) => (
-      <span
-        key={t}
-        onClick={() => onTagClick?.(t)}
-        className="cursor-pointer bg-slate-100 px-3 py-1 rounded-full 
+        <div className="flex flex-wrap gap-2 mt-3">
+          {tags.map((t) => (
+            <span
+              key={t}
+              onClick={() => onTagClick?.(t)}
+              className="cursor-pointer bg-slate-100 px-3 py-1 rounded-full 
                    text-[11px] font-medium text-slate-700 hover:bg-slate-200"
-      >
-        #{t}
-      </span>
-    ))}
-  </div>
-)}
+            >
+              #{t}
+            </span>
+          ))}
+        </div>
+      )}
 
     </div>
   );

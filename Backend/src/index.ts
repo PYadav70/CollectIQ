@@ -154,7 +154,7 @@ app.post(
 
 app.post('/api/v1/content', userMiddleware, async (req, res) => {
     try {
-        const { title, link, type, details, tags } = req.body;
+        const { title, link, type, details, tags,visibility } = req.body;
 
         if (!link || !type) {
             return res.status(400).json({ msg: "link and type are required" });
@@ -168,6 +168,7 @@ app.post('/api/v1/content', userMiddleware, async (req, res) => {
             // use tags from frontend if it's an array, otherwise []
             tags: Array.isArray(tags) ? tags : [],
             status: "to-learn",
+            visibility:visibility || "public",
             // @ts-ignore
             userId: req.userId,
         });
@@ -278,7 +279,7 @@ app.delete('/api/v1/content/:id', userMiddleware, async (req, res) => {
 // updating the content
 app.put('/api/v1/content/:id', userMiddleware, async (req, res) => {
     const contentId = req.params.id;
-    const { title, link, type, details, tags } = req.body;
+    const { title, link, type, details, tags,visibility } = req.body;
 
     try {
         const Update: any = {};
@@ -288,6 +289,8 @@ app.put('/api/v1/content/:id', userMiddleware, async (req, res) => {
         if (type !== undefined) Update.type = type;
         if (details !== undefined) Update.details = details;
         if (tags !== undefined) Update.tags = tags;
+        if (visibility !== undefined) Update.visibility = visibility;
+
 
         const updated = await contentModel.findByIdAndUpdate(
             //@ts-ignore
